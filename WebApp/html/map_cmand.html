@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>WU lighting Control</title>
+	<meta name="viewport" content="initial-scale=1.0">
+	<meta charset="utf-8">
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+		integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+		crossorigin="" />
+	<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+		integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+		crossorigin=""></script>
+	<!-- Bootstrap core CSS -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.4.0.js"
+		integrity="sha256-DYZMCC8HTC+QDr5QNaIcfR7VSPtcISykd+6eSmBW5qo=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+		integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+		crossorigin="anonymous"></script>
+
+	<style>
+		#map {
+			height: 100%;
+			width: 100%;
+		}
+
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+
+</head>
+
+<body>
+	
+	<div id="map"></div>
+
+	<script>
+		var node = []
+		var map = L.map('map', { zoomControl: false }).setView([8.64159, 99.89747], 15);
+		var nodeControl = []
+		var r_data = []
+		var n_data = []
+
+
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href=”https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		}).addTo(map);
+
+		//L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{minZoom:1, maxZoom: 21,subdomains:['mt0','mt1','mt2','mt3']}).addTo(map);
+
+		$.ajax({
+			url: "/getrouting/all",
+			type: "get",
+			dataType: 'json',
+			contentType: "application/json",
+			success: function (res) {
+				r_data = res
+			}
+		})
+
+		$.ajax({
+			url: "/getnode/all",
+			type: "get",
+			dataType: 'json',
+			contentType: "application/json",
+			success: function (res) {
+				n_data = res
+				for (i = 0; i < Object.keys(n_data).length; i++) {
+					let flag = true
+					let j = 0
+					while (j < Object.keys(r_data).length) {
+						if (n_data[i].rid == r_data[j].rid) {
+							nodeControl[i] = '<table class="table table-bordered table-striped">' +
+								'<tr>' +
+								'<th>nID</th>' +
+								'<th>Status</th>' +
+								'<th>Action</th>' +
+								'</tr>' +
+								'<tr>' +
+								'<th>' + n_data[i].nid + '</th>' +
+								'<th>' + r_data[j].sw + '</th>' +
+								'<th>' +
+								'<button onclick="" class="btn btn-success">on </button>' +
+								'<span>  </span>' +
+								'<button onclick="" class="btn btn-danger">off</button>' +
+								'</th>' +
+								'</tr>'
+							flag = false
+							break
+						}
+						j++
+					}
+					if (flag) {
+						nodeControl[i] = '<table class="table table-bordered table-striped">' +
+							'<tr>' +
+							'<th>nID</th>' +
+							'<th>Status</th>' +
+							'</tr>' +
+							'<tr>' +
+							'<th>' + n_data[i].nid + '</th>' +
+							'<th>' + "Not found routing!" + '</th>'
+						'</tr>'
+					}
+
+					var nodeIcon = L.icon({ iconUrl: '/html/img/marker-problem.png', iconAnchor: [16, 32], popupAnchor: [0, -32] });
+					node[n_data[i].nid] = L.marker([n_data[i].lat, n_data[i].lng], { icon: nodeIcon }).addTo(map).bindPopup(nodeControl[i])
+					//node[i].remove();
+					try {
+						console.log(i + ": " + r_data[i].sw)
+					} catch (error) {
+
+					}
+				}
+			}
+		})
+
+
+	</script>
+
+</body>
+
+</html>

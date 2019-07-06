@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+        integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+        integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+        crossorigin=""></script>
+    <!-- Bootstrap JQuery core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.0.js"
+        integrity="sha256-DYZMCC8HTC+QDr5QNaIcfR7VSPtcISykd+6eSmBW5qo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <!-- Fullcalendar core CSS -->
+    <link href='https://fullcalendar.io/js/fullcalendar-scheduler-1.7.1/lib/fullcalendar.min.css' rel='stylesheet' />
+    <link href='https://fullcalendar.io/js/fullcalendar-scheduler-1.7.1/lib/fullcalendar.print.min.css' rel='stylesheet'
+        media='print' />
+    <link href='https://fullcalendar.io/js/fullcalendar-scheduler-1.7.1/scheduler.min.css' rel='stylesheet' />
+    <script src='https://fullcalendar.io/js/fullcalendar-scheduler-1.7.1/lib/moment.min.js'></script>
+    <script src='https://fullcalendar.io/js/fullcalendar-scheduler-1.7.1/lib/jquery.min.js'></script>
+    <script src='https://fullcalendar.io/js/fullcalendar-scheduler-1.7.1/lib/fullcalendar.min.js'></script>
+    <script src='https://fullcalendar.io/js/fullcalendar-scheduler-1.7.1/scheduler.min.js'></script>
+
+    <!-- DateTimepicker core CSS -->
+    <link rel="stylesheet" href="/html/css/bootstrap-datetimepicker.css">
+    <script src="/html/script/bootstrap-datetimepicker.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+            font-size: 14px;
+        }
+
+        #calendar {
+            max-width: 900px;
+            margin: 50px auto;
+        }
+    </style>
+
+    <title>WU Lighting Control</title>
+</head>
+
+<body>
+    <div class="d-flex justify-content-end">
+        <Table class="table table-bordered">
+            <tr>
+                <td>
+                    <div class="control-group">
+                        <label class="control-label">Start Time</label>
+                        <div id="dt1" class="controls input-append date form_datetime" data-date="2019-05-16T05:25:07Z"
+                            data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                            <input size="16" type="text" value="" readonly class="form-control">
+                            <span class="add-on"><i class="icon-remove"></i></span>
+                            <span class="add-on"><i class="icon-th"></i></span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">End Time</label>
+                        <div id="dt2" class="controls input-append date form_datetime" data-date="2019-05-16T05:25:07Z"
+                            data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                            <input size="16" type="text" value="" readonly class="form-control">
+                            <span class="add-on"><i class="icon-remove"></i></span>
+                            <span class="add-on"><i class="icon-th"></i></span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div id='calendar'></div>
+                </td>
+            </tr>
+        </Table>
+    </div>
+
+
+    <script>
+
+        $('#dt1').datetimepicker({
+            lang: 'th',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1
+        });
+
+        $('#dt2').datetimepicker({
+            lang: 'th',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1
+        });
+
+
+        function formatDate(date) {
+            var d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+
+        $(function () { // document ready
+
+            $('#calendar').fullCalendar({
+                schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',//ระบุ license ว่าเราใช้งาน license ประเภทใด
+                now: formatDate(new Date()),
+                editable: true, // enable draggable events
+                aspectRatio: 1.8,
+                scrollTime: '00:00', // undo default 6am scrollTime
+                header: {
+                    left: 'today prev,next',
+                    center: 'title',
+                    right: 'timelineDay,timelineThreeDays,agendaWeek,month,listWeek'
+                },
+                defaultView: 'timelineDay',
+                views: {
+                    timelineThreeDays: {
+                        type: 'timeline',
+                        duration: { days: 3 }
+                    }
+                },
+                resourceLabelText: 'Rooms',
+                resources: [
+                    { id: 'a', title: 'Auditorium A' },
+                    { id: 'b', title: 'Auditorium B', eventColor: 'green' },
+                    { id: 'c', title: 'Auditorium C', eventColor: 'orange' },
+                    {
+                        id: 'd', title: 'Auditorium D', children: [
+                            { id: 'd1', title: 'Room D1' },
+                            { id: 'd2', title: 'Room D2' }
+                        ]
+                    },
+                ],
+                events: [
+                    { id: '1', resourceId: 'b', start: '2017-09-07T02:00:00', end: '2017-09-07T07:00:00', title: 'event 1' },
+                    { id: '5', resourceId: 'f', start: '2017-09-07T00:30:00', end: '2017-09-07T02:30:00', title: 'event 5' }
+                ]
+            });
+        });
+
+    </script>
+
+</body>
+
+
+</html>
